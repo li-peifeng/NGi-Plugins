@@ -14,6 +14,30 @@
       ],
       "format": "json",
       "sha256": "6b969b167f8e633df94a73db76109fa1cd01180f3ae64e7acfe5f1d4ca5fe2ac"
+    },
+    {
+      "id": "plugin_dahlia",
+      "name": "DAHLIA",
+      "version": "1.0.0",
+      "api_version": 1,
+      "description": "DAHLIA 官方作品、海报与剧照",
+      "categories": [
+        "jav_censored"
+      ],
+      "format": "js",
+      "sha256": "14658a4b9d9c2f39df5d6123c5ceb0b8c71f6abaa1f96280723c79bde07e8aa6"
+    },
+    {
+      "id": "plugin_faleno",
+      "name": "FALENO",
+      "version": "1.0.0",
+      "api_version": 1,
+      "description": "FALENO 官方作品、海报与剧照",
+      "categories": [
+        "jav_censored"
+      ],
+      "format": "js",
+      "sha256": "a7115f27590dfce377fad8119ca3dad60a4e833a6120d882b464d731db6e7479"
     }
   ]
 }
