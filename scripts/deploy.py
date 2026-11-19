@@ -7,6 +7,7 @@ import re
 import stat
 import sys
 from zipfile import BadZipFile, ZipFile
+from zlib import error as ZipCompressionError
 
 ROOT = Path(__file__).resolve().parent.parent
 INSTALL = ROOT / "install"
@@ -37,7 +38,7 @@ def load_plugin(filename, data):
     if not isinstance(version, str) or len(version) > 32 or not re.fullmatch(r"(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*)){2}", version):
         raise ValueError("版本需为三段数字，例如 1.0.0")
     name = meta.get("name")
-    description = meta.get("description", "")
+    description = meta.get("description")
     if not isinstance(name, str) or not name.strip() or len(name.encode()) > 100:
         raise ValueError("插件名称无效")
     if not isinstance(description, str) or len(description.encode()) > 2000:
@@ -93,6 +94,7 @@ def read_archive(archive):
 
 def scan_releases():
     latest = {}
+    releases = set()
     for file in sorted(PLUGINS.glob("*/*/*")):
         if file.is_symlink() or file.parent.is_symlink() or file.parent.parent.is_symlink():
             raise ValueError(f"{file.relative_to(ROOT)} 必须使用普通目录和文件")
@@ -105,8 +107,10 @@ def scan_releases():
             raise ValueError(f"{file.relative_to(ROOT)} 与插件的 ID 或版本不符")
         version = version_key(meta)
         current = latest.get(plugin_id)
-        if current and version == version_key(current):
+        key = (plugin_id, version)
+        if key in releases:
             raise ValueError(f"{plugin_id} {meta['version']} 版本重复")
+        releases.add(key)
         if not current or version > version_key(current):
             latest[plugin_id] = meta
     return latest
@@ -126,9 +130,11 @@ def deploy():
             filename, data, meta = read_archive(archive)
             folder = PLUGINS / meta["id"] / meta["version"]
             target = folder / filename
-            if folder.exists() and (list(folder.iterdir()) != [target] or target.read_bytes() != data):
+            if folder.is_symlink() or folder.parent.is_symlink():
+                raise ValueError("插件目录必须是普通目录")
+            if folder.exists() and (not folder.is_dir() or list(folder.iterdir()) != [target] or target.read_bytes() != data):
                 raise ValueError("该版本已发布其他内容，请提高版本号后重新上传")
-        except (ValueError, BadZipFile, RuntimeError, NotImplementedError) as error:
+        except (ValueError, BadZipFile, RuntimeError, EOFError, ZipCompressionError) as error:
             errors.append(f"{archive.name!r}：{error}")
             continue
 

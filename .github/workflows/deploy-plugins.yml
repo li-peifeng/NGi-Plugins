@@ -3,7 +3,7 @@ name: 部署源插件
 on:
   push:
     branches: [main]
-    paths: ['install/*.zip', 'install/*.ZIP']
+    paths: ['install/**']
   workflow_dispatch:
 
 permissions:
