@@ -1,0 +1,162 @@
+{
+  "api_version": 1,
+  "id": "javarchive",
+  "name": "JavArchive",
+  "version": "1.1.0",
+  "description": "支持日本有码、无码和 FC2 番号搜索及指定详情页。启用后可加入对应分类的来源优先级。",
+  "base_url": "https://javarchive.com",
+  "categories": [
+    "jav_censored",
+    "jav_uncensored",
+    "jav_fc2"
+  ],
+  "query": {
+    "pattern": "(?i)^\\s*(?:\\[[^\\]]+\\]\\s*)*(?:FC2[\\s_-]*(?:PPV[\\s_-]*)?([0-9]{3,12})|(?:(?:carib(?:bean(?:com)?)?|カリビアンコム|加勒比|1pondo|一本道)[ _-]*(?:加勒比|一本道)?[ _-]*)?([0-9]{6}[-_][0-9]{3})|((?:[a-z][a-z0-9]{0,11}[-_ ][0-9]{2,7}|[a-z]{1,12}[0-9]{2,7})))\\s*$",
+    "replacement": "${1}${2}${3}"
+  },
+  "search": {
+    "path": "/search?q={query}",
+    "selector": "h3 a[href]",
+    "attribute": "href",
+    "number_pattern": "(?i)^\\s*(?:\\[[^\\]]+\\]\\s*)*(FC2[\\s_-]*(?:PPV[\\s_-]*)?[0-9]{3,12}|(?:carib(?:bean(?:com)?)?|カリビアンコム|加勒比|1pondo|一本道)[ _-]*(?:加勒比|一本道)?[ _-]*[0-9]{6}[-_ ]?[0-9]{3}|[0-9]{6}[-_][0-9]{3}|(?:[a-z][a-z0-9]{0,11}[-_ ][0-9]{2,7}|[a-z]{1,12}[0-9]{2,7}))(?:$|[^a-z0-9_-]|[-_][^a-z0-9])",
+    "number_group": 1,
+    "javarchive_catalog": true,
+    "href_pattern": "-pn\\.html(?:\\?|$)",
+    "heading": "Search Results",
+    "section_selector": ".box_right_all .news_1n",
+    "heading_selector": "h2"
+  },
+  "required_selectors": [
+    ".box_right_all h1",
+    ".box_right_all .news"
+  ],
+  "fields": [
+    {
+      "field": "Number",
+      "selector": ".box_right_all h1",
+      "required": true,
+      "transforms": [
+        {
+          "type": "capture",
+          "pattern": "(?i)^\\s*(?:\\[[^\\]]+\\]\\s*)*(FC2[\\s_-]*(?:PPV[\\s_-]*)?[0-9]{3,12}|(?:carib(?:bean(?:com)?)?|カリビアンコム|加勒比|1pondo|一本道)[ _-]*(?:加勒比|一本道)?[ _-]*[0-9]{6}[-_ ]?[0-9]{3}|[0-9]{6}[-_][0-9]{3}|(?:[a-z][a-z0-9]{0,11}[-_ ][0-9]{2,7}|[a-z]{1,12}[0-9]{2,7}))(?:$|[^a-z0-9_-]|[-_][^a-z0-9])",
+          "group": 1
+        },
+        {
+          "type": "replace",
+          "pattern": "(?i)^FC2[\\s_-]*(?:PPV[\\s_-]*)?([0-9]{3,12})$",
+          "replacement": "FC2-$1"
+        }
+      ]
+    },
+    {
+      "field": "Title",
+      "selector": ".box_right_all h1",
+      "required": true,
+      "transforms": [
+        {
+          "type": "replace",
+          "pattern": "(?i)^\\s*(?:\\[[^\\]]+\\]\\s*)*(?:FC2[\\s_-]*(?:PPV[\\s_-]*)?[0-9]{3,12}|(?:carib(?:bean(?:com)?)?|カリビアンコム|加勒比|1pondo|一本道)[ _-]*(?:加勒比|一本道)?[ _-]*[0-9]{6}[-_ ]?[0-9]{3}|[0-9]{6}[-_][0-9]{3}|(?:[a-z][a-z0-9]{0,11}[-_ ][0-9]{2,7}|[a-z]{1,12}[0-9]{2,7}))[\\s_-]*",
+          "replacement": ""
+        }
+      ]
+    },
+    {
+      "field": "OriginalTitle",
+      "selector": ".box_right_all h1",
+      "transforms": [
+        {
+          "type": "replace",
+          "pattern": "(?i)^\\s*(?:\\[[^\\]]+\\]\\s*)*(?:FC2[\\s_-]*(?:PPV[\\s_-]*)?[0-9]{3,12}|(?:carib(?:bean(?:com)?)?|カリビアンコム|加勒比|1pondo|一本道)[ _-]*(?:加勒比|一本道)?[ _-]*[0-9]{6}[-_ ]?[0-9]{3}|[0-9]{6}[-_][0-9]{3}|(?:[a-z][a-z0-9]{0,11}[-_ ][0-9]{2,7}|[a-z]{1,12}[0-9]{2,7}))[\\s_-]*",
+          "replacement": ""
+        }
+      ]
+    },
+    {
+      "field": "Cover",
+      "selector": ".box_right_all .news :is(.fisrst_sc img, img[itemprop=image])",
+      "attribute": "src",
+      "transforms": [
+        {
+          "type": "url",
+          "https_hosts": [
+            "javstore.net",
+            "javarchive.com"
+          ]
+        }
+      ]
+    },
+    {
+      "field": "ExtraFanart",
+      "selector": ".box_right_all .news #lightgallery li[data-src]",
+      "attribute": "data-src",
+      "all": true,
+      "transforms": [
+        {
+          "type": "url",
+          "https_hosts": [
+            "javstore.net"
+          ]
+        }
+      ]
+    },
+    {
+      "field": "Studio",
+      "selector": ".box_right_all .news",
+      "direct_text": true,
+      "transforms": [
+        {
+          "type": "capture",
+          "pattern": "(?m)^\\s*(?:卖家：|売り手：|Seller:)\\s*(.+?)\\s*$",
+          "group": 1
+        }
+      ]
+    },
+    {
+      "field": "Release",
+      "selector": ".box_right_all .news",
+      "direct_text": true,
+      "transforms": [
+        {
+          "type": "capture",
+          "pattern": "(?m)^\\s*(?:日期：|販売日：|Date:)\\s*(.+?)\\s*$",
+          "group": 1
+        },
+        {
+          "type": "date"
+        }
+      ]
+    },
+    {
+      "field": "Runtime",
+      "selector": ".box_right_all .news",
+      "direct_text": true,
+      "transforms": [
+        {
+          "type": "capture",
+          "pattern": "(?m)^\\s*(?:时长：|収録時間：|Duration:)\\s*(.+?)\\s*$",
+          "group": 1
+        },
+        {
+          "type": "duration"
+        }
+      ]
+    },
+    {
+      "field": "Tags",
+      "selector": ".box_right_all .news",
+      "direct_text": true,
+      "transforms": [
+        {
+          "type": "capture",
+          "pattern": "(?m)^\\s*(?:标签：|タグ：|Tags:)\\s*(.+?)\\s*$",
+          "group": 1
+        },
+        {
+          "type": "split",
+          "pattern": "[｜|]",
+          "exclude_pattern": "pt$"
+        }
+      ]
+    }
+  ]
+}

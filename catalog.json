@@ -1,4 +1,19 @@
 {
   "schema_version": 1,
-  "plugins": []
+  "plugins": [
+    {
+      "id": "javarchive",
+      "name": "JavArchive",
+      "version": "1.1.0",
+      "api_version": 1,
+      "description": "支持日本有码、无码和 FC2 番号搜索及指定详情页。启用后可加入对应分类的来源优先级。",
+      "categories": [
+        "jav_censored",
+        "jav_uncensored",
+        "jav_fc2"
+      ],
+      "format": "json",
+      "sha256": "6b969b167f8e633df94a73db76109fa1cd01180f3ae64e7acfe5f1d4ca5fe2ac"
+    }
+  ]
 }
